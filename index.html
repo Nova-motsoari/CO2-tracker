@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,31 +13,44 @@
       margin: 0;
       padding: 20px;
     }
+
     .container {
-      max-width: 800px;
+      max-width: 600px;
       margin: auto;
       background: #fff;
       padding: 20px;
       border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
-    h1 { text-align: center; }
-    select, input, button {
+
+    h1 {
+      text-align: center;
+    }
+
+    select,
+    input,
+    button {
       margin: 5px;
       padding: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
     }
+
     button {
       cursor: pointer;
       background: #28a745;
       color: white;
       border: none;
     }
-    button:hover { background: #218838; }
+
+    button:hover {
+      background: #218838;
+    }
+
     .activity-list {
       margin-top: 20px;
     }
+
     .activity-item {
       display: flex;
       justify-content: space-between;
@@ -45,12 +59,16 @@
       border-radius: 6px;
       margin-bottom: 5px;
     }
-    #chart-container { margin-top: 30px; }
+
+    #chart-container {
+      margin-top: 30px;
+    }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <h1>🌍 Carbon Footprint Tracker</h1>
+    <h2>Carbon Footprint Tracker</h2>
 
     <div>
       <label for="category">Category:</label>
@@ -124,7 +142,6 @@
       updateChart();
     }
 
-    // Chart.js setup
     let chart;
     function updateChart() {
       const categoryTotals = activities.reduce((acc, a) => {
@@ -147,9 +164,9 @@
       });
     }
 
-    // Initial render
     renderActivities();
     updateChart();
   </script>
 </body>
+
 </html>
