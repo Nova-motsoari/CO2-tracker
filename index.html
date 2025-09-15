@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carbon Footprint Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f8fa;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h1 { text-align: center; }
+    select, input, button {
+      margin: 5px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      cursor: pointer;
+      background: #28a745;
+      color: white;
+      border: none;
+    }
+    button:hover { background: #218838; }
+    .activity-list {
+      margin-top: 20px;
+    }
+    .activity-item {
+      display: flex;
+      justify-content: space-between;
+      background: #f1f1f1;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 5px;
+    }
+    #chart-container { margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌍 Carbon Footprint Tracker</h1>
+
+    <div>
+      <label for="category">Category:</label>
+      <select id="category">
+        <option value="transport">Transport</option>
+        <option value="food">Food</option>
+        <option value="energy">Energy</option>
+      </select>
+
+      <label for="activity">Activity:</label>
+      <select id="activity">
+        <option value="car">Car travel (10 km)</option>
+        <option value="bus">Bus travel (10 km)</option>
+        <option value="beef">Beef meal</option>
+        <option value="chicken">Chicken meal</option>
+        <option value="electricity">Electricity (5 kWh)</option>
+      </select>
+
+      <button onclick="addActivity()">Add</button>
+    </div>
+
+    <div class="activity-list" id="activity-list"></div>
+
+    <h2>Total CO₂: <span id="total">0</span> kg</h2>
+
+    <div id="chart-container">
+      <canvas id="summaryChart"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const activityValues = {
+      car: { label: "Car travel (10 km)", co2: 2.3, category: "transport" },
+      bus: { label: "Bus travel (10 km)", co2: 1.0, category: "transport" },
+      beef: { label: "Beef meal", co2: 5.0, category: "food" },
+      chicken: { label: "Chicken meal", co2: 2.0, category: "food" },
+      electricity: { label: "Electricity (5 kWh)", co2: 1.5, category: "energy" }
+    };
+
+    let activities = JSON.parse(localStorage.getItem("activities")) || [];
+
+    function addActivity() {
+      const activityKey = document.getElementById("activity").value;
+      const activity = activityValues[activityKey];
+      activities.push(activity);
+      localStorage.setItem("activities", JSON.stringify(activities));
+      renderActivities();
+      updateChart();
+    }
+
+    function renderActivities(filter = null) {
+      const list = document.getElementById("activity-list");
+      list.innerHTML = "";
+      let total = 0;
+      activities
+        .filter(a => !filter || a.category === filter)
+        .forEach((a, i) => {
+          total += a.co2;
+          const div = document.createElement("div");
+          div.className = "activity-item";
+          div.innerHTML = `${a.label} - ${a.co2} kg CO₂ <button onclick="removeActivity(${i})">❌</button>`;
+          list.appendChild(div);
+        });
+      document.getElementById("total").textContent = total.toFixed(2);
+    }
+
+    function removeActivity(index) {
+      activities.splice(index, 1);
+      localStorage.setItem("activities", JSON.stringify(activities));
+      renderActivities();
+      updateChart();
+    }
+
+    // Chart.js setup
+    let chart;
+    function updateChart() {
+      const categoryTotals = activities.reduce((acc, a) => {
+        acc[a.category] = (acc[a.category] || 0) + a.co2;
+        return acc;
+      }, {});
+
+      const data = {
+        labels: Object.keys(categoryTotals),
+        datasets: [{
+          data: Object.values(categoryTotals),
+          backgroundColor: ["#ff6384", "#36a2eb", "#ffce56"]
+        }]
+      };
+
+      if (chart) chart.destroy();
+      chart = new Chart(document.getElementById("summaryChart"), {
+        type: "pie",
+        data: data
+      });
+    }
+
+    // Initial render
+    renderActivities();
+    updateChart();
+  </script>
+</body>
+</html>
